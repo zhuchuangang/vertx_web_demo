@@ -25,4 +25,8 @@ public class UserDao {
         page.setData(users);
         return page;
     }
+
+    public void addUser(User user){
+        users.add(user);
+    }
 }

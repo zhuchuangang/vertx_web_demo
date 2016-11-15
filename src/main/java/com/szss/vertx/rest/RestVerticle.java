@@ -1,11 +1,14 @@
 package com.szss.vertx.rest;
 
+import io.vertx.core.http.HttpMethod;
+import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.json.Json;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.StaticHandler;
 
 /**
@@ -29,6 +32,10 @@ public class RestVerticle extends AbstractVerticle {
         router.route("/webjars/*").handler(StaticHandler.create("META-INF/resources/webjars"));
 
         router.get("/api/users").handler(this::findAll);
+
+        //
+        router.route("/api/user*").handler(BodyHandler.create());
+        router.post("/api/user").handler(this::addUser);
 
         vertx.createHttpServer()
                 .requestHandler(router::accept)
@@ -54,5 +61,18 @@ public class RestVerticle extends AbstractVerticle {
         HttpServerResponse response = routingContext.response();
         response.putHeader("content-type", "application/json,charset=utf-8")
                 .end(Json.encodePrettily(userDao.findAll()));
+    }
+
+    private void addUser(RoutingContext routingContext){
+        HttpServerRequest request=routingContext.request();
+        String username=request.getParam("username");
+        Integer age=Integer.valueOf(request.getParam("age"));
+        String province=request.getParam("province");
+        Boolean gender=Boolean.valueOf(request.getParam("gender"));
+        User user=new User(null,username,age,gender,province);
+        userDao.addUser(user);
+        HttpServerResponse response = routingContext.response();
+        response.setStatusCode(200).putHeader("content-type", "text/json,charset=utf-8")
+                .end("{\"success\":true}");
     }
 }
