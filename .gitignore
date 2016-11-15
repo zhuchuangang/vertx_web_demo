@@ -1,0 +1,18 @@
+# idea #
+*.iml
+*.ipr
+*.iws
+.idea
+
+# class #
+*.class
+
+# Package Files #
+#*.jar
+*.war
+*.ear
+
+#maven
+*/target
+./target
+target
