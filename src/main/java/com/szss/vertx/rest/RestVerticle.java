@@ -1,6 +1,5 @@
 package com.szss.vertx.rest;
 
-import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.AbstractVerticle;
@@ -33,9 +32,10 @@ public class RestVerticle extends AbstractVerticle {
 
         router.get("/api/users").handler(this::findAll);
 
-        //
         router.route("/api/user*").handler(BodyHandler.create());
         router.post("/api/user").handler(this::addUser);
+        router.put("/api/user/:id").handler(this::updateUser);
+        router.delete("/api/user/:id").handler(this::deleteUser);
 
         vertx.createHttpServer()
                 .requestHandler(router::accept)
@@ -69,9 +69,35 @@ public class RestVerticle extends AbstractVerticle {
         Integer age=Integer.valueOf(request.getParam("age"));
         String province=request.getParam("province");
         Boolean gender=Boolean.valueOf(request.getParam("gender"));
-        User user=new User(null,username,age,gender,province);
+
+        User user=new User(UserDao.users.size(),username,age,gender,province);
         userDao.addUser(user);
         HttpServerResponse response = routingContext.response();
+        response.setStatusCode(200).putHeader("content-type", "text/json,charset=utf-8")
+                .end("{\"success\":true}");
+    }
+
+    private void updateUser(RoutingContext routingContext){
+        String id = routingContext.request().getParam("id");
+        User user=Json.decodeValue(routingContext.getBodyAsString(),User.class);
+        UserDao.users.remove(Integer.valueOf(id));
+        user.setId(Integer.valueOf(id));
+        UserDao.users.set(user.getId(),user);
+        HttpServerResponse response=routingContext.response();
+        response.setStatusCode(200).putHeader("content-type", "text/json,charset=utf-8")
+                .end("{\"success\":true}");
+    }
+
+    private void deleteUser(RoutingContext routingContext){
+        String id = routingContext.request().getParam("id");
+        int index=Integer.valueOf(id);
+        for (User u:UserDao.users){
+            if (u.getId()==index){
+                UserDao.users.remove(u);
+                break;
+            }
+        }
+        HttpServerResponse response=routingContext.response();
         response.setStatusCode(200).putHeader("content-type", "text/json,charset=utf-8")
                 .end("{\"success\":true}");
     }

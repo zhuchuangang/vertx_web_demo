@@ -269,6 +269,93 @@ desired effect
                 }
             });
         });
+
+
+
+        $("#modify-btn").click(function () {
+            bootbox.setLocale("zh_CN");
+            var temp = $(".datatable").find("input[name=table-check]:checked");
+            if (temp.length !=1) {
+                alert("请选择需要一条修改的记录!");
+                return;
+            }
+            var tr = $(temp).closest('tr');
+            var data=table.api().row(tr).data();
+
+            bootbox.dialog({
+                message: '<input id="username" type="text" placeholder="姓名" class="input-sm form-control" value="'+data.username+'">' +
+                '<input id="age" type="text" placeholder="年龄" class="input-sm form-control" value="'+data.age+'">' +
+                '<input id="province" type="text" placeholder="省份" class="input-sm form-control" value="'+data.province+'">' +
+                '<select id="gender" class="input-sm form-control" placeholder="选择性别">' +
+                (data.gender=="true"?'<option value="true" selected="true">男</option>':'<option value="true">男</option>') +
+                (data.gender=="false"?'<option value="false" selected="true">女</option>':'<option value="false">女</option>') +
+                '</select>',
+                title: "修改",
+                buttons: {
+                    "success": {
+                        "label": "<i class='icon-ok'></i> 确定",
+                        "className": "btn-sm btn-success",
+                        "callback": function () {
+                            $.ajax({
+                                type: "PUT",
+                                url: "/api/user/"+data.id,
+                                data: JSON.stringify({
+                                    username: $("#username").val(),
+                                    age:$("#age").val(),
+                                    province:$("#province").val(),
+                                    gender:$("#gender").val()
+                                }),
+                                dataType: "json",
+                                success: function (data) {
+                                    if (data.success==true) {
+                                        table.fnDraw();
+                                    }else{
+                                        alert("修改失败");
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+        });
+
+
+        $("#remove-btn").click(function () {
+            bootbox.setLocale("zh_CN");
+            var temp = $(".datatable").find("input[name=table-check]:checked");
+            if (temp.length !=1) {
+                alert("请选择一条需要删除的记录!");
+                return;
+            }
+            var tr = $(temp).closest('tr');
+            var data=table.api().row(tr).data();
+
+            bootbox.dialog({
+                message: '是否删除该记录?',
+                title: "删除",
+                buttons: {
+                    "success": {
+                        "label": "<i class='icon-ok'></i> 确定",
+                        "className": "btn-sm btn-success",
+                        "callback": function () {
+                            $.ajax({
+                                type: "DELETE",
+                                url: "/api/user/"+data.id,
+                                dataType: "json",
+                                success: function (data) {
+                                    if (data.success==true) {
+                                        table.fnDraw();
+                                    }else{
+                                        alert("删除失败");
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+        });
     });
 </script>
 </html>

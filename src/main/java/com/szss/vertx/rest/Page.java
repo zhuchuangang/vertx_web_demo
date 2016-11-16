@@ -1,6 +1,7 @@
 package com.szss.vertx.rest;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
  * Created by zcg on 2016/11/15.
  */
 @Data
+@NoArgsConstructor
 public class Page<T> {
     /**
      * 当前页号
