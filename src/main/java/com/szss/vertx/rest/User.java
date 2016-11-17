@@ -24,4 +24,11 @@ public class User implements Serializable{
         this.gender=gender;
         this.province=province;
     }
+
+    public User(String username,Integer age,Boolean gender,String province){
+        this.username=username;
+        this.age=age;
+        this.gender=gender;
+        this.province=province;
+    }
 }
